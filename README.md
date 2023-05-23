@@ -10,9 +10,9 @@ This project includes functions for data preprocessing and analysis of stock mar
 - [Pivot Table](#pivot-table)
 - [NBBO Depth Time Share Engine](#nbbo-depth-time-share-engine)
 - [Get NBBO Depth Time Share Metrics](#get-nbbo-depth-time-share-metrics)
-- [Get Quoted Spread]
-- [Get Effective Spread]
-- [Get Realised Spread]
+- [Get Quoted Spread](#get-quoted-spread)
+- [Get Effective Spread](#get-effective-spread)
+- [Get Realised Spread](#get-realised-spread)
 
 ## Preprocess Data
 The `preprocess_data` function performs data preprocessing tasks on the input DataFrame. It includes steps such as converting timestamps to datetime, separating dataframes by stock and exchange, filling missing values, and filtering data based on certain conditions.
