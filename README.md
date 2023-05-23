@@ -1,6 +1,8 @@
 # Order-Protection-Rule-project
 First project in PhD
 This project includes functions for data preprocessing and analysis of stock market data in relation to the implementation of the Order Protection Rule event. 
+Working paper: 
+https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3484590
 
 ## Table of Contents
 - [Preprocess Data](#preprocess-data)
