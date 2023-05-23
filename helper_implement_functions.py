@@ -4,6 +4,10 @@ from collections import defaultdict
 from datetime import datetime, date, time, timedelta
 from multiprocessing import Pool
 import os
+from trade_through_autocorrelation import *
+from spreads_metrics import *
+from preprocess_data import *
+from metrics_descriptive import *
 fields = ['Date[L]', 'Time[L]', '#RIC', 'Type', 'Price', 'Volume', 'Bid Price', 'Bid Size', 'Ask Price', 'Ask Size',
           'Qualifiers']
 
@@ -113,4 +117,38 @@ def exchange_times(df):
     df[['Date[L]', 'stock']] = df[['Date[L]', 'stock']].fillna(method='ffill')
     df[['Date[L]', 'stock']] = df[['Date[L]', 'stock']].fillna(method='backfill')
     return df
+
+
+def implement(filename):
+    df = pd.read_csv(filename, sep=',', usecols=fields, dtype=str, na_filter=False)
+    df[['Price', 'Volume', 'Bid Price', 'Bid Size', 'Ask Price', 'Ask Size']] = df[
+        ['Price', 'Volume', 'Bid Price', 'Bid Size', 'Ask Price', 'Ask Size']].apply(pd.to_numeric,
+                                                                                     errors='coerce')
+    df['venue'] = df['#RIC'].str.split('.', expand=True)[1]
+    df['stock'] = df['#RIC'].str.split('.', expand=True)[0]
+    df['timestamp'] = fast_timestamp_parse(df['Date[L]'] + df['Time[L]'])
+    df = convert_size(df)
+    df = fill_previous_quote_status(df)
+    df = calculate_mid_quote(df)
+    df = assign_trade_direction(df)
+    df = create_v_col(df)
+    df = shift_bid_ask_columns(df)
+
+    df = exchange_times(df)
+
+    df = fast_timestamp_parse(df['timestamp'])
+    df = preprocess_data(df)
+    value_volume_metrics(df, filename)
+    df_table = pivot_table(df)[0]
+    bid_price_venue = pivot_table(df)[1]
+    ask_price_venue = pivot_table(df)[2]
+    mid_quote_venues = pivot_table(df)[3]
+    price_venues = pivot_table(df)[4]
+    get_nbbo_depth_time_share_metrics(df_table,bid_price_venue,ask_price_venue,filename)
+    get_quoted_spread(df_table,mid_quote_venues,filename)
+    get_effective_spread(df_table, price_venues, mid_quote_venues, filename)
+    get_realised_spread(df_table,bid_price_venue, ask_price_venue, price_venues, filename)
+    compute_trade_throughs(df_table, price_venues)
+    process_autocorrelation(df, price_venues, o_time, c_time, filename)
+
 
