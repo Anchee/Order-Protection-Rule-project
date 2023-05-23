@@ -95,3 +95,22 @@ def shift_bid_ask_columns(df):
     df['Ask depth prev'] = df.groupby('venue')['Ask Size abs'].shift(1)
     df['Bid depth prev'] = df.groupby('venue')['Bid Size abs'].shift(1)
     return df
+# all the exchanges' different time schedule
+o_time = time(9, 45, 00)
+c_time = time(15, 30, 00)
+
+o_time_df_TO = pd.Series(['09:45:00.000', 'TO'], index=['Time[L]', 'venue'])
+c_time_df_TO = pd.Series(['15:30:00.000', 'TO'], index=['Time[L]', 'venue'])
+o_time_df_GO = pd.Series(['09:45:00.000', 'GO'], index=['Time[L]', 'venue'])
+c_time_df_GO = pd.Series(['15:30:00.000', 'GO'], index=['Time[L]', 'venue'])
+o_time_df_ALP = pd.Series(['09:45:00.000', 'ALP'], index=['Time[L]', 'venue'])
+c_time_df_ALP = pd.Series(['15:30:00.000', 'ALP'], index=['Time[L]', 'venue'])
+o_time_df_CXC = pd.Series(['09:45:00.000', 'CXC'], index=['Time[L]', 'venue'])
+c_time_df_CXC = pd.Series(['15:30:00.000', 'CXC'], index=['Time[L]', 'venue'])
+def exchange_times(df):
+    df = df.append([o_time_df_TO, c_time_df_TO, o_time_df_GO, c_time_df_GO, o_time_df_ALP, c_time_df_ALP, o_time_df_CXC,
+                    c_time_df_CXC], ignore_index=True)
+    df[['Date[L]', 'stock']] = df[['Date[L]', 'stock']].fillna(method='ffill')
+    df[['Date[L]', 'stock']] = df[['Date[L]', 'stock']].fillna(method='backfill')
+    return df
+
